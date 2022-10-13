@@ -1,8 +1,12 @@
 from email.message import Message
 from re import L
+from tokenize import PseudoExtras
+from pkg_resources import require
 import telebot 
-import sqlite3
+import psycopg2
 from telebot import types
+
+BOT_URI = "postgres://cgbwayommyykzb:09fadf657398e9a7d48cc10ff38477696f5d1d6f0a568be73a47e35720e9b3b5@ec2-52-208-164-5.eu-west-1.compute.amazonaws.com:5432/dcu96jj3h5brdb"
 
 bot = telebot.TeleBot("5758825270:AAFIW5MEJg1nSOSKyMFVyHnuVlYNfrBz8X0")
 remove_keyboard = types.ReplyKeyboardRemove()
@@ -10,7 +14,7 @@ remove_keyboard = types.ReplyKeyboardRemove()
 @bot.message_handler(commands=['start'])
 def start(message):
 
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
     man_id = message.chat.id
     cursor.execute("SELECT id FROM users WHERE user_id = ?", (man_id,))
@@ -40,7 +44,7 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def message_user(message):
     
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
 
     if(message.text == "1️⃣ Москва") or (message.text =="2️⃣ Санкт-Петербург"):
@@ -83,7 +87,7 @@ def RSSS_book(message):
         send = bot.send_message(message.chat.id, "Введите жанр книги, которую ищете")
         bot.register_next_step_handler(send, search_genre)
     elif(message.text == "Удалить запись о книге"):
-        connect = sqlite3.connect('books.db')
+        connect = psycopg2.connect(BOT_URI, sslmode="require")
         cursor = connect.cursor()
 
         cursor.execute("SELECT id, book_name, author, genre FROM record_books WHERE user_id = ?", (message.from_user.id,))
@@ -152,7 +156,7 @@ def yes_no(message, name, author, genre):
 
     if (message.text == "Да"):
 
-        connect = sqlite3.connect('books.db')
+        connect = psycopg2.connect(BOT_URI, sslmode="require")
         cursor = connect.cursor()
 
         cursor.execute("SELECT city FROM users WHERE user_id = ?", (message.from_user.id,))
@@ -174,7 +178,7 @@ def yes_no(message, name, author, genre):
 def search_name(message):
 
     book_name = message.text.lower()
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
     cursor.execute("SELECT id, book_name, author, genre FROM record_books WHERE book_name = ?", (book_name,))
     connect.commit()
@@ -205,7 +209,7 @@ def search_name(message):
 def search_author(message):
 
     author = message.text.lower()
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
 
     cursor.execute("SELECT id, book_name, author, genre FROM record_books WHERE author = ?", (author,))
@@ -238,7 +242,7 @@ def search_author(message):
 def search_genre(message):
 
     genre = message.text.lower()
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
 
     cursor.execute("SELECT id, book_name, author, genre FROM record_books WHERE genre = ?", (genre,))
@@ -302,7 +306,7 @@ def yes_no_for_search(message):
 
 def id_book_delete(message):
     id = message.text
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
@@ -321,7 +325,7 @@ def id_book_delete(message):
 
 def id_book_message(message):
     id = message.text
-    connect = sqlite3.connect('books.db')
+    connect = psycopg2.connect(BOT_URI, sslmode="require")
     cursor = connect.cursor()
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
