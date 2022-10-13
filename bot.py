@@ -16,7 +16,7 @@ logger = telebot.logger
 logger.setLevel(logging.DEBUG)
 remove_keyboard = types.ReplyKeyboardRemove()
 
-connect = psycopg2.connect(BOT_URI, sslmode="require")
+connect = sqlite3.connect('books.db')
 cursor = connect.cursor()
 
 @bot.message_handler(commands=['start'])
