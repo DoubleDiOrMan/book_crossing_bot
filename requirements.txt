@@ -1,4 +1,4 @@
-telebot
+pyTelegramBotAPI
 sqlite3
 re
 email.message
