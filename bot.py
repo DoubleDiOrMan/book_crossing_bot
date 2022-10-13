@@ -1,15 +1,23 @@
 from email.message import Message
+import logging
 from re import L
 from tokenize import PseudoExtras
+import flask
 from pkg_resources import require
 import telebot 
 import psycopg2
+from flask import Flask, request
 from telebot import types
+from config import *
 
-BOT_URI = "postgres://cgbwayommyykzb:09fadf657398e9a7d48cc10ff38477696f5d1d6f0a568be73a47e35720e9b3b5@ec2-52-208-164-5.eu-west-1.compute.amazonaws.com:5432/dcu96jj3h5brdb"
-
-bot = telebot.TeleBot("5758825270:AAFIW5MEJg1nSOSKyMFVyHnuVlYNfrBz8X0")
+bot = telebot.TeleBot(BOT_TOKEN)
+server = Flask(__name__)
+logger = telebot.logger
+logger.setLevel(logging.DEBUG)
 remove_keyboard = types.ReplyKeyboardRemove()
+
+connect = psycopg2.connect(BOT_URI, sslmode="require")
+cursor = connect.cursor()
 
 @bot.message_handler(commands=['start'])
 def start(message):
